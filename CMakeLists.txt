@@ -12,4 +12,4 @@ set(SOURCES
     src/log.cpp
 )
 
-add_executable(test tests/hi.cpp ${SOURCES})
+add_executable(test tests/one_user_naive.cpp ${SOURCES})
