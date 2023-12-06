@@ -1,6 +1,7 @@
 #ifndef USER_HPP
 #define USER_HPP
 #include <vector>
+#include <optional>
 
 using namespace std;
 
@@ -23,14 +24,14 @@ private:
     Elevator* elevator;
     ElevatorSystem& system;
     vector<Goal> goals;
-    Goal* current_goal;
+    optional<Goal> current_goal;
 
 public:
     User(ElevatorSystem& s);
     Status getStatus();
     int getFloor();
     int getWeight();
-    Goal* getCurrentGoal();
+    Goal getCurrentGoal();
     void addGoal(Goal goal);
     void enterElevator(Elevator* elevator);
     void leaveElevator();
