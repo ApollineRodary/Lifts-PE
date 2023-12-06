@@ -22,7 +22,7 @@ public:
     int getMaxFloor();
     bool isValidFloor(int floor);
 
-    virtual void call(int floor, string command);
+    virtual void call(int floor, int time, string command);
     void addElevator(Elevator* e);
     vector<Elevator*>& getElevators();
 };
