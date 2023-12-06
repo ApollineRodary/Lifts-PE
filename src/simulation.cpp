@@ -3,6 +3,7 @@
 #include "simulation.hpp"
 #include "elevator_system.hpp"
 #include "user.hpp"
+#include "elevator.hpp"
 #include "log.hpp"
 
 using namespace std;
@@ -14,6 +15,8 @@ Simulation::Simulation(ElevatorSystem& system, vector<User*> users) : system(sys
 void Simulation::tick() {
     for (auto user: users)
         user->tick(time);
+    for (auto elevator: system.getElevators())
+        elevator->tick(time);
     time++;
 }
 
