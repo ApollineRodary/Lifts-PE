@@ -4,12 +4,14 @@
 #include "user.hpp"
 #include "elevator.hpp"
 #include "elevator_system.hpp"
+#include "log.hpp"
 
 using namespace std;
 
 User::User(ElevatorSystem& s) : system(s) {
     goals = vector<Goal>();
     status = IDLE;
+    current_goal.reset();
     floor = 0;
 }
 
@@ -25,8 +27,9 @@ int User::getWeight() {
     return weight;
 }
 
-Goal* User::getCurrentGoal() {
-    return current_goal;
+Goal User::getCurrentGoal() {
+    assert(current_goal.has_value());
+    return current_goal.value();
 }
 
 void User::addGoal(Goal goal) {
@@ -44,7 +47,7 @@ void User::leaveElevator() {
     floor = elevator->getFloor();
     elevator->removeUser(this);
     elevator = nullptr;
-    current_goal = nullptr;
+    current_goal.reset();
     status = IDLE;
 }
 
@@ -55,12 +58,13 @@ void User::tick(int time) {
         for (Goal goal: goals) {
             if (goal.time != time)
                 continue;
-            current_goal = &goal;
-            assert(current_goal->source_floor == floor);
-            if (current_goal->target_floor > floor)
-                system.call(floor, "CALL_ELEVATOR_UP");
+            current_goal = goal;
+            assert(goal.source_floor == floor);
+            if (goal.target_floor > floor)
+                system.call(floor, time, "CALL_ELEVATOR_UP");
             else
-                system.call(floor, "CALL_ELEVATOR_DOWN");
+                system.call(floor, time, "CALL_ELEVATOR_DOWN");
+            status = WAITING;
             return;
         }
         break;
@@ -71,14 +75,15 @@ void User::tick(int time) {
             if (!e->getIsOpen() || (e->getFloor() != floor) || (getWeight() > e->getRemainingCapacity()))
                 continue;
             enterElevator(e);
-            e->requestFloor(current_goal->target_floor);
+            debugStream("User::tick") << '!' << time << '?' << "Entering elevator" << '!' << floor << endl;
+            e->requestFloor(current_goal.value().target_floor);
             return;
         }
         break;
 
         case IN_ELEVATOR:
         // See if the current elevator is at the target floor
-        if (elevator->getFloor() == current_goal->target_floor)
+        if (elevator->getFloor() == current_goal.value().target_floor)
             leaveElevator();
         break;
     }
