@@ -13,3 +13,4 @@ set(SOURCES
 )
 
 add_executable(test tests/one_user_naive.cpp ${SOURCES})
+add_executable(scan tests/scan_test.cpp ${SOURCES})
