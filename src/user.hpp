@@ -14,6 +14,8 @@ struct Goal {
     int source_floor;
     int target_floor;
     int time;
+
+    Goal(int source, int target, int t): source_floor(source), target_floor(target), time(t) {}
 };
 
 class User {
@@ -27,7 +29,7 @@ private:
     optional<Goal> current_goal;
 
 public:
-    User(ElevatorSystem& s);
+    User(ElevatorSystem& s, int floor, int weight);
     Status getStatus();
     int getFloor();
     int getWeight();

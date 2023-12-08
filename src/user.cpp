@@ -8,11 +8,10 @@
 
 using namespace std;
 
-User::User(ElevatorSystem& s) : system(s) {
+User::User(ElevatorSystem& s, int floor, int weight) : system(s), floor(floor), weight(weight) {
     goals = vector<Goal>();
     status = IDLE;
     current_goal.reset();
-    floor = 0;
 }
 
 Status User::getStatus() {
@@ -76,7 +75,7 @@ void User::tick(int time) {
                 continue;
             enterElevator(e);
             debugStream("User::tick") << '!' << time << '?' << "Entering elevator" << '!' << floor << endl;
-            e->requestFloor(current_goal.value().target_floor);
+            e->requestFloor(current_goal.value().target_floor, time);
             return;
         }
         break;
