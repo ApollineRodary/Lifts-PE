@@ -18,6 +18,8 @@ bool ElevatorSystem::isValidFloor(int floor) {
     return (floor>=min_floor && floor<=max_floor);
 }
 
+void ElevatorSystem::tick(int time) {};
+
 void ElevatorSystem::call(int floor, int time, string command) {};
 
 void ElevatorSystem::addElevator(Elevator* e) {
