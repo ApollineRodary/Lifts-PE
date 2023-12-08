@@ -13,6 +13,7 @@ Simulation::Simulation(ElevatorSystem& system, vector<User*> users) : system(sys
 }
 
 void Simulation::tick() {
+    system.tick(time);
     for (auto user: users)
         user->tick(time);
     for (auto elevator: system.getElevators())
