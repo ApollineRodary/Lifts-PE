@@ -7,13 +7,17 @@
 int ELEVATOR_OPEN_DELAY = 3;
 int ELEVATOR_MOVE_DELAY = 5;
 
-Elevator::Elevator(ElevatorSystem& system, int floor): floor(floor), system(system) {
+Elevator::Elevator(ElevatorSystem& system, int floor, int capacity): floor(floor), system(system), capacity(capacity) {
     system.addElevator(this);
     is_open = false;
-    is_moving = false;
+    direction = NONE;
     time_since_last_update = 0;
     target_floor = floor;
 };
+
+ElevatorSystem& Elevator::getElevatorSystem() {
+    return system;
+}
 
 int Elevator::getFloor() {
     return floor;
@@ -34,12 +38,16 @@ bool Elevator::getIsOpen() {
     return is_open;
 }
 
+Direction Elevator::getDirection() {
+    return direction;
+}
+
 vector<User*> Elevator::getUsers() {
     return users;
 }
 
 void Elevator::tick(int time) {
-    if (is_open || is_moving || target_floor != floor) time_since_last_update++;
+    if (is_open || (direction != NONE) || target_floor != floor) time_since_last_update++;
 
     if (is_open) {
         // Close the doors once they've been open for long enough
@@ -48,15 +56,15 @@ void Elevator::tick(int time) {
         debugStream("Elevator::tick") << '!' << time << '?' << "Closing doors" << '!' << floor << endl;
         is_open = false;
         if (target_floor != floor)
-            is_moving = true;
+            direction = (target_floor>floor)?UP:DOWN;
     } else {
         // Move one floor once the elevator has been moving for long enough
         if (time_since_last_update < ELEVATOR_MOVE_DELAY) return;
         time_since_last_update = 0;
         
-        if (floor < target_floor)
+        if (direction==UP)
             floor++;
-        else if (floor > target_floor)
+        else if (direction==DOWN)
             floor--;
 
         debugStream("Elevator::tick") << '!' << time << '?' << "Changed floor" << '!' << floor << endl;
@@ -64,15 +72,27 @@ void Elevator::tick(int time) {
         if (floor == target_floor) {
             debugStream("Elevator::tick") << '!' << time << '?' << "Opening doors" << '!' << floor << endl;
             is_open = true;
-            is_moving = false;
+            direction = NONE;
         }
     }
 }
 
-void Elevator::requestFloor(int floor) {}
+void Elevator::requestFloor(int floor, int time) {}
 
-void Elevator::moveToFloor(int floor) {
+void Elevator::moveToFloor(int floor, int time) {
     assert(system.isValidFloor(floor));
+    
+    if (target_floor != floor)
+        debugStream("Elevator::moveToFloor") << '!' << time << '?' << "New target" << '!' << floor << endl;
+    
+    if (floor > this->floor) {
+        assert (direction != DOWN);
+        direction = UP;
+    } else if (floor < this->floor) {
+        assert (direction != UP);
+        direction = DOWN;
+    }
+
     target_floor = floor;
 }
 
