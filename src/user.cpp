@@ -35,6 +35,10 @@ void User::addGoal(Goal goal) {
     goals.push_back(goal);
 }
 
+vector<Goal> User::getGoals() {
+    return goals;
+}
+
 void User::enterElevator(Elevator* e) {
     assert(getFloor() == e->getFloor());
     e->addUser(this);

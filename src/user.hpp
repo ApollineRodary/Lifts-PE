@@ -35,6 +35,7 @@ public:
     int getWeight();
     Goal getCurrentGoal();
     void addGoal(Goal goal);
+    vector<Goal> getGoals();
     void enterElevator(Elevator* elevator);
     void leaveElevator();
     void tick(int time);
