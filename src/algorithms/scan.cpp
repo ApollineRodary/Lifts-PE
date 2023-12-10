@@ -63,7 +63,7 @@ public:
                             break;
                         }
                     }
-                    if (!requests_left || e->getUsers().size() == 0)
+                    if (!requests_left || (e->getIsOpen() && e->getUsers().size() == 0))
                         e->sweepDirection = DOWN;
                 break;
                 
@@ -77,7 +77,7 @@ public:
                             break;
                         }
                     }
-                    if (!requests_left || e->getUsers().size() == 0)
+                    if (!requests_left || (e->getIsOpen() && e->getUsers().size() == 0))
                         e->sweepDirection = UP;
                 break;
             }
