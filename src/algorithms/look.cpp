@@ -6,30 +6,30 @@
 
 using namespace std;
 
-class ScanElevator: public Elevator {
+class LookElevator: public Elevator {
 public:
     vector<bool> requestedFloors;
-    Direction scanDirection;
+    Direction sweepDirection;
 
-    ScanElevator(ElevatorSystem& system, int floor, int capacity): Elevator(system, floor, capacity) {
-        scanDirection = NONE;
+    LookElevator(ElevatorSystem& system, int floor, int capacity): Elevator(system, floor, capacity) {
+        sweepDirection = NONE;
         requestedFloors = vector<bool>(system.getMaxFloor()-system.getMinFloor()+1, false);
     }
 
     void requestFloor(int floor, int time) override {
         requestedFloors[floor - getElevatorSystem().getMinFloor()] = true;
-        debugStream("ScanElevator::requestFloor") << '!' << time << '?' << "Asked for floor" << '!' << floor << endl;
+        debugStream("LookElevator::requestFloor") << '!' << time << '?' << "Asked for floor" << '!' << floor << endl;
     }
 };
 
-class ScanElevatorSystem: public ElevatorSystem {
+class LookElevatorSystem: public ElevatorSystem {
 public:
-    ScanElevatorSystem(int min_floor, int max_floor): ElevatorSystem(min_floor, max_floor) {};
+    LookElevatorSystem(int min_floor, int max_floor): ElevatorSystem(min_floor, max_floor) {};
 
     void tick(int time) override {
         for (auto elevator: getElevators()) {
-            ScanElevator* e = (ScanElevator*) elevator;
-            switch (e->scanDirection) {
+            LookElevator* e = (LookElevator*) elevator;
+            switch (e->sweepDirection) {
                 case NONE:
                 // If the elevator has no current direction, then go to the first requested floor that is found
                 for (int floor=getMinFloor(); floor<=getMaxFloor(); floor++) {
@@ -44,32 +44,32 @@ public:
 
                 case UP:
                 // If the elevator is going up, then make sure to stop at every requested floor, and only reset once there is no floor requested above
-                if (e->getFloor() == getMaxFloor()) e->scanDirection = DOWN;
+                if (e->getFloor() == getMaxFloor()) e->sweepDirection = DOWN;
                 for (int floor=e->getFloor()+1; floor<=getMaxFloor(); floor++) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
                         e->setTarget(floor, time);
                         break;
                     }
-                    e->scanDirection = NONE;
+                    e->sweepDirection = NONE;
                 }
                 break;
 
                 case DOWN:
                 // If the elevator is going down, then make sure to stop at every requested floor, and only reset once there is no floor requested below
-                if (e->getFloor() == getMinFloor()) e->scanDirection = UP;
+                if (e->getFloor() == getMinFloor()) e->sweepDirection = UP;
                 for (int floor=e->getFloor()-1; floor>=getMinFloor(); floor--) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
                         e->setTarget(floor, time);
                         break;
                     }
-                    e->scanDirection = NONE;
+                    e->sweepDirection = NONE;
                 }
                 break;
             }
             
             if (elevator->getDirection() != NONE)
-                // Scan direction is the last direction the elevator went
-                e->scanDirection = elevator->getDirection();
+                // Sweep direction is the last direction the elevator went
+                e->sweepDirection = elevator->getDirection();
             
             if (elevator->getIsOpen())
                 // If the elevator is open, the current floor is no longer a target
@@ -79,7 +79,7 @@ public:
 
     void call(int floor, int time, string command) override {
         for (auto elevator: getElevators())
-            if (elevator->getFloor() != floor)
+            if (elevator->getFloor() != floor || !elevator->getTargetFloor().has_value())
                 elevator->requestFloor(floor, time);
             else
                 elevator->wait();

@@ -9,7 +9,7 @@
 #include "elevator_system.hpp"
 #include "simulation.hpp"
 #include "log.hpp"
-#include "algorithms/scan.cpp"
+#include "algorithms/look.cpp"
 #include "generation/user_generation.hpp"
 
 #define OUTPUT_FILENAME "../results/one_src_multiple_target.json"
@@ -24,7 +24,7 @@ int main() {
 
     time_simu = round(time_simu/tick_duration);
 
-    ScanElevatorSystem monod(0, 4);
+    LookElevatorSystem monod(0, 4);
 
     cout << "Total simulation time: " << time_simu << " ticks" << endl
         << "Open delay: " << ELEVATOR_OPEN_DELAY << " ticks" << endl
@@ -42,7 +42,7 @@ int main() {
     for (float lambda : lambdas) {
         cout << endl << "===== LAMBDA: " << lambda << " arrivals per second =====" << endl; 
 
-        ScanElevator e(monod, 0, max_capacity);
+        LookElevator e(monod, 0, max_capacity);
 
         ELEVATOR_OPEN_DELAY = round(open_time/tick_duration); //0.8 min
         ELEVATOR_MOVE_DELAY = round(move_time/tick_duration); // 0.1 min
