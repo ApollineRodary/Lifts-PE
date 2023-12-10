@@ -19,6 +19,8 @@ public:
     Simulation(ElevatorSystem& system, vector<User*> users);
     void tick();
     void repeat(int n);
+    vector<int> getWaitingTimes();
+    vector<int> getRegretTimes();
 };
 
 #endif

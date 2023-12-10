@@ -27,3 +27,17 @@ void Simulation::repeat(int n) {
     for (int i=0; i<n; i++)
         tick();
 }
+
+vector<int> Simulation::getRegretTimes() {
+    vector<int> v = {};
+    for (auto u: users)
+        v.push_back(u->getTotalRegretTime());
+    return v;
+}
+
+vector<int> Simulation::getWaitingTimes() {
+    vector<int> v = {};
+    for (auto u: users)
+        v.push_back(u->getTotalWaitingTime());
+    return v;
+}
