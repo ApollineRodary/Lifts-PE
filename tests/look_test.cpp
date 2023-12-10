@@ -7,6 +7,7 @@
 #include "simulation.hpp"
 #include "log.hpp"
 #include "algorithms/look.cpp"
+#include "user_presets/pe_group.hpp"
 
 int main() {
     /**
@@ -20,22 +21,17 @@ int main() {
     LookElevatorSystem monod(-1, 4);
     LookElevator e(monod, 2, 13);
 
-    User apo(monod, 0, 1);
-    User tib(monod, 4, 1);
-    User isa(monod, -1, 1);
-
-    apo.addGoal(Goal(0, 2, 6));
-    isa.addGoal(Goal(-1, 2, 23));
-    tib.addGoal(Goal(4, 3, 25));
-
-    Simulation sim(monod, {&apo, &tib, &isa});
+    PEGroup users(monod);
+    Simulation sim(monod, users());
     sim.repeat(100);
 
-    cout << "Total Apo Waiting time: " << apo.getTotalWaitingTime() << endl
-        << "Total Isa Waiting time: " << isa.getTotalWaitingTime() << endl
-        << "Total Tib Waiting time: " << tib.getTotalWaitingTime() << endl;
+    cout << "\nWaiting times:";
+    for (int w: sim.getWaitingTimes())
+        cout << " " << w;
+    cout << "\nRegrets:";
+    for (int r: sim.getRegretTimes())
+        cout << " " << r;
     cout << endl;
-    cout << "Total Apo Regret time: " << apo.getTotalRegretTime() << endl
-        << "Total Isa Regret time: " << isa.getTotalRegretTime() << endl
-        << "Total Tib Regret time: " << tib.getTotalRegretTime() << endl;
+
+    return 0;
 }
