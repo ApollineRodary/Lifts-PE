@@ -12,12 +12,12 @@
 #include "algorithms/look.cpp"
 #include "generation/user_generation.hpp"
 
-#define OUTPUT_FILENAME "../results/one_src_multiple_target.json"
+#define OUTPUT_FILENAME "../results/one_source_multi_targ_two_elevators.json"
 
 int main() {
     float tick_duration = 1; //second
-    float time_simu = 12000; //seconds
-    float open_time = 0.3*60; //seconds
+    float time_simu = 6000; //seconds
+    float open_time = 0.8*60; //seconds
     float move_time = 0.1*60; //seconds
     int max_capacity = 6;
 
@@ -25,6 +25,9 @@ int main() {
     time_simu = round(time_simu/tick_duration);
     ELEVATOR_OPEN_DELAY = round(open_time/tick_duration);
     ELEVATOR_MOVE_DELAY = round(move_time/tick_duration);
+
+    //Instanciate ElevatorSystem
+    LookElevatorSystem monod(0, 4);
 
     //Print infos
     cout << "Total simulation time: " << time_simu << " ticks" << endl
@@ -38,18 +41,16 @@ int main() {
     vector<float> lambdas;
     vector<float> means;
 
-    for (float lambda = 0.0 ; lambda <= 2.01 ; lambda += 0.2)
+    for (float lambda = 0.2 ; lambda <= 2.0 ; lambda += 0.2)
         lambdas.push_back(lambda*tick_duration/60);
 
     //Launch the simulations
     for (float lambda : lambdas) {
         cout << endl << "===== LAMBDA: " << lambda << " arrivals per second =====" << endl; 
 
-        //Reinstanciate ElevatorSystem
-        LookElevatorSystem monod(0, 4);
-
-        //Reinstanciate an elevator
-        LookElevator e(monod, 0, max_capacity);
+        //Reinstanciate elevators
+        LookElevator e1(monod, 0, max_capacity);
+        LookElevator e2(monod, 0, max_capacity);
          
         //Informations
         cout << "There should be approximately " << lambda * time_simu << " arrivals" << endl << endl;
@@ -78,7 +79,7 @@ int main() {
 
         //Launch simulation
         Simulation sim(monod, users);
-        sim.repeat(5*time_simu);
+        sim.repeat(time_simu);
 
         //Compute mean waiting time
         float mean = 0;

@@ -60,13 +60,13 @@ void User::enterElevator(Elevator* e, int time) {
 }
 
 void User::leaveElevator(int time) {
-    debugStream("User::leaveElevator") << '!' << time << '?' << "Leaving elevator" << '!' << floor << endl;
-
     total_waiting_time += time - last_request_time - 1;
     total_regret_time += time - last_request_time -  ELEVATOR_MOVE_DELAY * abs((current_goal.value().target_floor - current_goal.value().source_floor)) - ELEVATOR_OPEN_DELAY - 1;
     is_served = true;
 
     floor = elevator->getFloor();
+    debugStream("User::leaveElevator") << '!' << time << '?' << "Leaving elevator" << '!' << floor << endl;
+
     elevator->removeUser(this);
     elevator = nullptr;
     current_goal.reset();

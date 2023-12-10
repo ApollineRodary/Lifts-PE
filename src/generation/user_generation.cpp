@@ -14,8 +14,8 @@ vector<User*> user_generation(vector<float> lambdas, float mw, float sw, vector<
 
             int target = draw_discrete_distribution(targ_distrib[src_floor].begin(), targ_distrib[src_floor].end());
 
-            User* user = new User(s, src_floor-s.getMinFloor(), weight);
-            Goal goal(src_floor-s.getMinFloor(), target-s.getMinFloor(), floor(times[u]));
+            User* user = new User(s, src_floor+s.getMinFloor(), weight);
+            Goal goal(src_floor+s.getMinFloor(), target+s.getMinFloor(), floor(times[u]));
             user->addGoal(goal);
 
             users.push_back(user);
