@@ -9,7 +9,7 @@ int ELEVATOR_MOVE_DELAY = 5;
 
 Elevator::Elevator(ElevatorSystem& system, int floor, int capacity): floor(floor), system(system), capacity(capacity) {
     system.addElevator(this);
-    is_open = false;
+    is_open = true;
     direction = NONE;
     time_since_last_update = 0;
     target_floor = floor;

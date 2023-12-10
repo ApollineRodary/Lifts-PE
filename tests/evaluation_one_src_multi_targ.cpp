@@ -36,9 +36,8 @@ int main() {
     vector<float> lambdas;
     vector<float> means;
 
-    for (float lambda = 0.2 ; lambda <= 0.3 ; lambda += 0.2) {
+    for (float lambda = 0.2 ; lambda <= 0.3 ; lambda += 0.2)
         lambdas.push_back(lambda*tick_duration/60);
-    }
 
     for (float lambda : lambdas) {
         cout << endl << "===== LAMBDA: " << lambda << " arrivals per second =====" << endl; 
@@ -70,8 +69,7 @@ int main() {
                 << "Source floor: " << user->getGoals().front().source_floor << " (should be 0)" << endl
                 << "Weight: " << user->getWeight() << " (should be 1)" << endl << endl;
         }
-        cout << "There are " << users.size() << " arrivals";
-        cout << endl;
+        cout << "There are " << users.size() << " arrivals" << endl;
 
         Simulation sim(monod, users);
         sim.repeat(time_simu);

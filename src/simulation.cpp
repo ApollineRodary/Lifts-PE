@@ -22,9 +22,8 @@ void Simulation::tick() {
 }
 
 void Simulation::repeat(int n) {
-    for (int i=0; i<n; i++) {
-        if (i==0)
-            debugStream("Simulation::repeat") << '!' << i << endl;
+    debugStream("Simulation::repeat") << '!' << "" << '?' << "Starting simulation" << endl;
+    debugStream("Simulation::repeat") << '!' << users.size() << '?' << "users" << '!' << system.getElevators().size() << '?' << "elevators" << endl;
+    for (int i=0; i<n; i++)
         tick();
-    }
 }
