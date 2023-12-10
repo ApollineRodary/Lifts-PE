@@ -29,57 +29,58 @@ public:
     void tick(int time) override {
         for (auto elevator: getElevators()) {
             LookElevator* e = (LookElevator*) elevator;
+            
+            // Forget requests for the current floor once the doors are open
+            if (e->getIsOpen())
+                e->requestedFloors[e->getFloor() - getMinFloor()] = false;
+
             switch (e->sweepDirection) {
+                bool requests_left;
+                
                 case NONE:
-                // If the elevator has no current direction, then go to the first requested floor that is found
-                for (int floor=getMinFloor(); floor<=getMaxFloor(); floor++) {
-                    if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->setTarget(floor, time);
-                        if (floor == e->getFloor())
-                            e->requestedFloors[floor - getMinFloor()] = false;
-                        break;
+                    if (elevator->getDirection() != NONE) {
+                        // Sync sweep direction and direction, if the elevator is already moving
+                        e->sweepDirection = elevator->getDirection();
+                        continue;
                     }
-                }
+                    for (int floor=getMinFloor(); floor<=getMaxFloor(); floor++) {
+                        // Otherwise, get moving to the first requested floor that is found
+                        if (e->requestedFloors[floor-getMinFloor()]) {
+                            e->setTarget(floor, time);
+                            e->sweepDirection = elevator->getDirection();
+                            break;
+                        }
+                    }
                 break;
 
                 case UP:
-                // If the elevator is going up, then make sure to stop at every requested floor, and only reset once there is no floor requested above
-                if (e->getFloor() == getMaxFloor()) {
-                    e->sweepDirection = DOWN;
-                    return;
-                }
-                for (int floor=e->getFloor()+1; floor<=getMaxFloor(); floor++) {
-                    if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->setTarget(floor, time);
-                        break;
+                    // If the elevator is going up, then go to the next requested floor above, and reset once there is no request left
+                    requests_left = false;
+                    for (int floor=e->getFloor()+1; floor<=getMaxFloor(); floor++) {
+                        if (e->requestedFloors[floor-getMinFloor()]) {
+                            e->setTarget(floor, time);
+                            requests_left = true;
+                            break;
+                        }
                     }
-                    e->sweepDirection = NONE;
-                }
+                    if (!requests_left)
+                        e->sweepDirection = NONE;
                 break;
-
+                
                 case DOWN:
-                // If the elevator is going down, then make sure to stop at every requested floor, and only reset once there is no floor requested below
-                if (e->getFloor() == getMinFloor()) {
-                    e->sweepDirection = UP;
-                    return;
-                }
-                for (int floor=e->getFloor()-1; floor>=getMinFloor(); floor--) {
-                    if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->setTarget(floor, time);
-                        break;
+                    // If the elevator is going down, then make sure to stop at every requested floor, and only reset once there is no floor requested below
+                    requests_left = false;
+                    for (int floor=e->getFloor()-1; floor>=getMinFloor(); floor--) {
+                        if (e->requestedFloors[floor-getMinFloor()]) {
+                            e->setTarget(floor, time);
+                            requests_left = true;
+                            break;
+                        }
                     }
-                    e->sweepDirection = NONE;
-                }
+                    if (!requests_left)
+                        e->sweepDirection = NONE;
                 break;
             }
-            
-            if (elevator->getDirection() != NONE)
-                // Sweep direction is the last direction the elevator went
-                e->sweepDirection = elevator->getDirection();
-            
-            if (elevator->getIsOpen())
-                // If the elevator is open, the current floor is no longer a target
-                e->requestedFloors[elevator->getFloor() - getMinFloor()] = false;
         }
     }
 
