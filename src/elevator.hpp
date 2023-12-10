@@ -38,6 +38,7 @@ public:
 
     void tick(int floor);
     virtual void requestFloor(int floor, int time);
+    void wait();
     void setTarget(int floor, int time);
     void addUser(User* user);
     void removeUser(User* user);

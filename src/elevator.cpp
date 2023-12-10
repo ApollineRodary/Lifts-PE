@@ -96,6 +96,10 @@ void Elevator::setTarget(int floor, int time) {
     target_floor = floor;
 }
 
+void Elevator::wait() {
+    time_since_last_update = 0;
+}
+
 void Elevator::addUser(User* user) {
     assert(user->getWeight() <= getRemainingCapacity());
     users.push_back(user);
