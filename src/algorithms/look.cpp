@@ -44,7 +44,10 @@ public:
 
                 case UP:
                 // If the elevator is going up, then make sure to stop at every requested floor, and only reset once there is no floor requested above
-                if (e->getFloor() == getMaxFloor()) e->sweepDirection = DOWN;
+                if (e->getFloor() == getMaxFloor()) {
+                    e->sweepDirection = DOWN;
+                    return;
+                }
                 for (int floor=e->getFloor()+1; floor<=getMaxFloor(); floor++) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
                         e->setTarget(floor, time);
@@ -56,7 +59,10 @@ public:
 
                 case DOWN:
                 // If the elevator is going down, then make sure to stop at every requested floor, and only reset once there is no floor requested below
-                if (e->getFloor() == getMinFloor()) e->sweepDirection = UP;
+                if (e->getFloor() == getMinFloor()) {
+                    e->sweepDirection = UP;
+                    return;
+                }
                 for (int floor=e->getFloor()-1; floor>=getMinFloor(); floor--) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
                         e->setTarget(floor, time);
