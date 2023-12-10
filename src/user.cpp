@@ -53,12 +53,15 @@ bool User::getIsServed() {
 
 void User::enterElevator(Elevator* e, int time) {
     assert(getFloor() == e->getFloor());
+    debugStream("User::enterElevator") << '!' << time << '?' << "Entering elevator" << '!' << floor << endl;
     e->addUser(this);
     elevator = e;
     status = IN_ELEVATOR;
 }
 
 void User::leaveElevator(int time) {
+    debugStream("User::leaveElevator") << '!' << time << '?' << "Leaving elevator" << '!' << floor << endl;
+
     total_waiting_time += time - last_request_time - 1;
     total_regret_time += time - last_request_time -  ELEVATOR_MOVE_DELAY * abs((current_goal.value().target_floor - current_goal.value().source_floor)) - ELEVATOR_OPEN_DELAY - 1;
     is_served = true;
@@ -95,10 +98,11 @@ void User::tick(int time) {
         case WAITING:
         // See if there is an elevator open at the current floor with enough room
         for (Elevator* e: system.getElevators()) {
+            if (getWeight() > e->getRemainingCapacity())
+                debugStream("User::tick") << '!' << time << '?' << "Full elevator" << endl;
             if (!e->getIsOpen() || (e->getFloor() != floor) || (getWeight() > e->getRemainingCapacity()))
                 continue;
             enterElevator(e, time);
-            debugStream("User::tick") << '!' << time << '?' << "Entering elevator" << '!' << floor << endl;
             e->requestFloor(current_goal.value().target_floor, time);
             return;
         }
