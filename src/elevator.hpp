@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cassert>
+#include <optional>
 
 using namespace std;
 
@@ -20,10 +21,12 @@ private:
     ElevatorSystem& system;
     int floor;
     int capacity;
-    int target_floor;
     int time_since_last_update;
     bool is_open;
+    optional<int> target_floor;
     Direction direction;
+    void openDoors(int time);
+    void closeDoors(int time);
 
 public:
     Elevator(ElevatorSystem& system, int floor, int capacity);
@@ -33,6 +36,7 @@ public:
     int getCapacity();
     int getRemainingCapacity();
     bool getIsOpen();
+    optional<int> getTargetFloor();
     Direction getDirection();
     vector<User*> getUsers();
 
