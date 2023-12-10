@@ -36,9 +36,9 @@ public:
     Direction getDirection();
     vector<User*> getUsers();
 
-    virtual void tick(int floor);
+    void tick(int floor);
     virtual void requestFloor(int floor, int time);
-    void moveToFloor(int floor, int time);
+    void setTarget(int floor, int time);
     void addUser(User* user);
     void removeUser(User* user);
 };

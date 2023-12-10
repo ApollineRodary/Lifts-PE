@@ -13,8 +13,7 @@ public:
 
     ScanElevator(ElevatorSystem& system, int floor, int capacity): Elevator(system, floor, capacity) {
         scanDirection = NONE;
-        for (int i=system.getMinFloor(); i<=system.getMaxFloor(); i++)
-            requestedFloors.push_back(false);
+        requestedFloors = vector<bool>(system.getMaxFloor()-system.getMinFloor()+1, false);
     }
 
     void requestFloor(int floor, int time) override {
@@ -35,7 +34,7 @@ public:
                 // If the elevator has no current direction, then go to the first requested floor that is found
                 for (int floor=getMinFloor(); floor<=getMaxFloor(); floor++) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->moveToFloor(floor, time);
+                        e->setTarget(floor, time);
                         if (floor == e->getFloor())
                             e->requestedFloors[floor - getMinFloor()] = false;
                         break;
@@ -48,7 +47,7 @@ public:
                 if (e->getFloor() == getMaxFloor()) e->scanDirection = DOWN;
                 for (int floor=e->getFloor()+1; floor<=getMaxFloor(); floor++) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->moveToFloor(floor, time);
+                        e->setTarget(floor, time);
                         break;
                     }
                     e->scanDirection = NONE;
@@ -60,13 +59,14 @@ public:
                 if (e->getFloor() == getMinFloor()) e->scanDirection = UP;
                 for (int floor=e->getFloor()-1; floor>=getMinFloor(); floor--) {
                     if (e->requestedFloors[floor-getMinFloor()]) {
-                        e->moveToFloor(floor, time);
+                        e->setTarget(floor, time);
                         break;
                     }
                     e->scanDirection = NONE;
                 }
                 break;
             }
+            
             if (elevator->getDirection() != NONE)
                 // Scan direction is the last direction the elevator went
                 e->scanDirection = elevator->getDirection();

@@ -79,7 +79,7 @@ void Elevator::tick(int time) {
 
 void Elevator::requestFloor(int floor, int time) {}
 
-void Elevator::moveToFloor(int floor, int time) {
+void Elevator::setTarget(int floor, int time) {
     assert(system.isValidFloor(floor));
     
     if (target_floor != floor)

@@ -17,7 +17,7 @@ public:
     void call(int floor, int time, string command) override {
         debugStream("TestElevatorSystem::call") << '!' << time << '?' << command << '!' << floor << endl;
         for (auto elevator: getElevators())
-            elevator->moveToFloor(floor, time);
+            elevator->setTarget(floor, time);
     }
 };
 
@@ -27,7 +27,7 @@ public:
 
     void requestFloor(int floor, int time) override {
         debugStream("TestElevator::requestFloor") << '!' << time << '?' << " " << '!' << floor << endl;
-        moveToFloor(floor, time);
+        setTarget(floor, time);
     }
 };
 
