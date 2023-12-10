@@ -79,6 +79,9 @@ public:
 
     void call(int floor, int time, string command) override {
         for (auto elevator: getElevators())
-            elevator->requestFloor(floor, time);
+            if (elevator->getFloor() != floor)
+                elevator->requestFloor(floor, time);
+            else
+                elevator->wait();
     }
 };
