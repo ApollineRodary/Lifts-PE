@@ -2,6 +2,7 @@
 #define USER_HPP
 #include <vector>
 #include <optional>
+#include <list>
 
 using namespace std;
 
@@ -25,8 +26,12 @@ private:
     Status status;
     Elevator* elevator;
     ElevatorSystem& system;
-    vector<Goal> goals;
+    list<Goal> goals;
     optional<Goal> current_goal;
+    int total_waiting_time = 0;
+    int total_regret_time = 0;
+    int last_request_time;
+    bool is_served = false;
 
 public:
     User(ElevatorSystem& s, int floor, int weight);
@@ -35,10 +40,13 @@ public:
     int getWeight();
     Goal getCurrentGoal();
     void addGoal(Goal goal);
-    vector<Goal> getGoals();
-    void enterElevator(Elevator* elevator);
-    void leaveElevator();
+    list<Goal> getGoals();
+    void enterElevator(Elevator* elevator, int time);
+    void leaveElevator(int time);
     void tick(int time);
+    int getTotalWaitingTime();
+    int getTotalRegretTime();
+    bool getIsServed();
 };
 
 #endif

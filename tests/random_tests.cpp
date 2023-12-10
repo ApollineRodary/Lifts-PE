@@ -20,18 +20,18 @@ int main() {
     ElevatorSystem s(0, 2);
 
     vector<float> lambdas = {1, 0, 0.5}; //Mean number of arrivals on a unit of time, equals to lambda
-    vector<User> users = user_generation(lambdas, 1, 0, {{0, 1, 1}, {2, 0, 1}, {2, 1, 0}}, 100, s);
+    vector<User*> users = user_generation(lambdas, 1, 0, {{0, 1, 1}, {2, 0, 1}, {2, 1, 0}}, 100, s);
 
     vector<vector<int>> interrarival_times = {{}, {}, {}};
     vector<vector<int>> arrival_times = {{}, {}, {}};
     for (auto user : users) {
         cout << "===== USER =====" << endl
-            << "Weight: " << user.getWeight() << endl
-            << "Arrival time: " << user.getGoals()[0].time << endl
-            << "Source floor: " << user.getGoals()[0].source_floor << endl
-            << "Target floor: " << user.getGoals()[0].target_floor << endl
+            << "Weight: " << user->getWeight() << endl
+            << "Arrival time: " << user->getGoals().front().time << endl
+            << "Source floor: " << user->getGoals().front().source_floor << endl
+            << "Target floor: " << user->getGoals().front().target_floor << endl
             << "==========" << endl;
-        arrival_times[user.getGoals()[0].source_floor].push_back(user.getGoals()[0].time);
+        arrival_times[user->getGoals().front().source_floor].push_back(user->getGoals().front().time);
     }
 
     for (int i = 0 ; i < arrival_times.size() ; i++) {
@@ -53,6 +53,6 @@ int main() {
         cout << "Excpected mean arrival time for floor " << i << ": " << 1/lambdas[i] << endl
             << "Empiric mean arrival time for floor " << i << ": " << mean << endl << endl;
     }
-
+    delete_generated_users(users);
     return 0;
 }

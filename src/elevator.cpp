@@ -83,7 +83,7 @@ void Elevator::setTarget(int floor, int time) {
     assert(system.isValidFloor(floor));
     
     if (target_floor != floor)
-        debugStream("Elevator::moveToFloor") << '!' << time << '?' << "New target" << '!' << floor << endl;
+        debugStream("Elevator::setTarget") << '!' << time << '?' << "New target" << '!' << floor << endl;
     
     if (floor > this->floor) {
         assert (direction != DOWN);
@@ -91,6 +91,9 @@ void Elevator::setTarget(int floor, int time) {
     } else if (floor < this->floor) {
         assert (direction != UP);
         direction = DOWN;
+    } else {
+        assert (direction == NONE);
+        is_open = true;
     }
 
     target_floor = floor;

@@ -17,3 +17,4 @@ set(SOURCES
 add_executable(test tests/one_user_naive.cpp ${SOURCES})
 add_executable(scan tests/scan_test.cpp ${SOURCES})
 add_executable(test_random tests/random_tests.cpp ${SOURCES})
+add_executable(one_src_multi_targ tests/evaluation_one_src_multi_targ.cpp ${SOURCES})

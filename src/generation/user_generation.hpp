@@ -4,4 +4,6 @@
 
 using namespace std;
 
-vector<User> user_generation(vector<float> lambdas, float mw, float sw, vector<vector<int>> targ_distrib, int tmax, ElevatorSystem& s);
+vector<User*> user_generation(vector<float> lambdas, float mw, float sw, vector<vector<int>> targ_distrib, int tmax, ElevatorSystem& s);
+
+void delete_generated_users(vector<User*> &users);

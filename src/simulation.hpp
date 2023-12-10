@@ -13,6 +13,7 @@ private:
     ElevatorSystem& system;
     vector<User*> users;
     int time;
+    bool log;
 
 public:
     Simulation(ElevatorSystem& system, vector<User*> users);

@@ -30,4 +30,12 @@ int main() {
 
     Simulation sim(monod, {&apo, &tib, &isa});
     sim.repeat(100);
+
+    cout << "Total Apo Waiting time: " << apo.getTotalWaitingTime() << endl
+        << "Total Isa Waiting time: " << isa.getTotalWaitingTime() << endl
+        << "Total Tib Waiting time: " << tib.getTotalWaitingTime() << endl;
+    cout << endl;
+    cout << "Total Apo Regret time: " << apo.getTotalRegretTime() << endl
+        << "Total Isa Regret time: " << isa.getTotalRegretTime() << endl
+        << "Total Tib Regret time: " << tib.getTotalRegretTime() << endl;
 }

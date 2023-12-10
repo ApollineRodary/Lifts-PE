@@ -9,7 +9,7 @@
 using namespace std;
 
 User::User(ElevatorSystem& s, int floor, int weight) : system(s), floor(floor), weight(weight) {
-    goals = vector<Goal>();
+    goals = list<Goal>();
     status = IDLE;
     current_goal.reset();
 }
@@ -35,22 +35,39 @@ void User::addGoal(Goal goal) {
     goals.push_back(goal);
 }
 
-vector<Goal> User::getGoals() {
+list<Goal> User::getGoals() {
     return goals;
 }
 
-void User::enterElevator(Elevator* e) {
+int User::getTotalWaitingTime() {
+    return total_waiting_time;
+}
+
+int User::getTotalRegretTime() {
+    return total_regret_time;
+}
+
+bool User::getIsServed() {
+    return is_served;
+}
+
+void User::enterElevator(Elevator* e, int time) {
     assert(getFloor() == e->getFloor());
     e->addUser(this);
     elevator = e;
     status = IN_ELEVATOR;
 }
 
-void User::leaveElevator() {
+void User::leaveElevator(int time) {
+    total_waiting_time += time - last_request_time - 1;
+    total_regret_time += time - last_request_time -  ELEVATOR_MOVE_DELAY * abs((current_goal.value().target_floor - current_goal.value().source_floor)) - ELEVATOR_OPEN_DELAY - 1;
+    is_served = true;
+
     floor = elevator->getFloor();
     elevator->removeUser(this);
     elevator = nullptr;
     current_goal.reset();
+    
     status = IDLE;
 }
 
@@ -59,14 +76,17 @@ void User::tick(int time) {
         case IDLE:
         // See if there are goals for the current tick
         for (Goal goal: goals) {
-            if (goal.time != time)
+            if (goal.time > time)
                 continue;
             current_goal = goal;
+            goals.pop_front();
             assert(goal.source_floor == floor);
             if (goal.target_floor > floor)
                 system.call(floor, time, "CALL_ELEVATOR_UP");
             else
                 system.call(floor, time, "CALL_ELEVATOR_DOWN");
+
+            last_request_time = time;
             status = WAITING;
             return;
         }
@@ -77,7 +97,7 @@ void User::tick(int time) {
         for (Elevator* e: system.getElevators()) {
             if (!e->getIsOpen() || (e->getFloor() != floor) || (getWeight() > e->getRemainingCapacity()))
                 continue;
-            enterElevator(e);
+            enterElevator(e, time);
             debugStream("User::tick") << '!' << time << '?' << "Entering elevator" << '!' << floor << endl;
             e->requestFloor(current_goal.value().target_floor, time);
             return;
@@ -87,7 +107,7 @@ void User::tick(int time) {
         case IN_ELEVATOR:
         // See if the current elevator is at the target floor
         if (elevator->getFloor() == current_goal.value().target_floor)
-            leaveElevator();
+            leaveElevator(time);
         break;
     }
 }
