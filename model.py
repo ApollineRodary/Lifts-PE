@@ -49,31 +49,33 @@ def G(m,l,i):
         sum=sum +prod
     sum=sum*comb(l-1, m-1)
     sum=sum/ pow(N, i)
-    print("proba result =",sum)
+    #print("proba result =",sum)
     if sum >1 :
-        print("ERROR PROBA")
+        print("ERROR PROBA GREATER THAN 1")
     return sum
 
 # Expectation function
 #This function allows us to calculate the expectation 
 #of travel time of the elevator for i passangers
-def exp(i):
+def exp_mu(i):
     sum=0
+    sum_m=0
     for l in range(1,N+1):
         for m in range(1,l+1):
-            print("m=",m,"l=",l)
+            #print("m=",m,"l=",l)
             p=((m+1)*t_stop + 2*l*t_floor)
-            print("travel time =",p)
-            q=p*G(m,l,i)
-            sum=sum + q
-    return sum
+            #print("travel time =",p)
+            g=G(m,l,i)
+            sum=sum + p*g
+            sum_m=sum_m + m*g
+    return sum_m/sum 
+
 
 
 #Graph Function
 #This function create the graph of the expectation as a function of i 
-mu = 6.0/exp(c)
+mu = exp_mu(c)
 x=np.arange(0.2, 2.2, 0.2)
-print(len(x))
 lam=x
 y=1.0/(mu-lam)
 plt.plot(x, y, label="Model")
