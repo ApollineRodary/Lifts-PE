@@ -3,13 +3,11 @@
 DebugStream debugStream;
 
 DebugStream& DebugStream::operator()(const string prefix) {
-    //return *this;
     cout << "@" << prefix << string(30 - prefix.length(), ' ');
     return *this;
 }
 
 int DebugStreamBuffer::overflow(int c) {
-    //return c;
     switch(c) {
         case '!':
             debugStream << setw(10);
