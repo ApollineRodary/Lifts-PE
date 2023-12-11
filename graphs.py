@@ -60,21 +60,10 @@ def expected_waiting_time(i):
  
 # Graph expected waiting time as a function of average arrival rate
 
-x=np.arange(0.2, 2.2, 0.2)
-
-WHICH_GRAPH = 1
-
-if WHICH_GRAPH == 1:
-    # Thibault's
-    mu = 6/expected_waiting_time(capacity)
-    lam = x
-    y = 1.0/(mu-lam)
-
-elif WHICH_GRAPH == 2:
-    # Isaline's
-    mu = 1/expected_waiting_time(capacity)
-    lam = x/6
-    y = 1.0/(mu - lam)
+x=np.arange(0, 2.2, 0.2)
+mu = capacity/expected_waiting_time(capacity)
+lam = x
+y = 1.0/(mu-lam) + 0.6
 
 plt.plot(x, y, label="$1/(\mu - \lambda)$")
 
