@@ -25,10 +25,9 @@ Simulations are based on a list of `User`s, all with their own goals (which floo
 ### Model verification
 
 In order to verify the model, build the project then execute `one_source_multi_targ` and `one_source_multi_targ_two` in the `build` folder. The results will be saved respectively in `results/one_src_multiple_target.json` and `results/one_src_multiple_target_two_elevators.json`.  
-Then execute the Python script `model.py`, that will plot the graphs and save the figure in `results/graphs_one_source_multiple_targets.png`.
+Then execute the Python script `graphs.py`, that will plot the graphs and save the figure in `results/graphs_one_source_multiple_targets.png`.
 
 ### Comparison of LOOK and SCAN on "realistic" examples
 
 Build the project and execute `realistic_look` and `realistic_scan`. Results will be stored in `results/realistic_look.txt` and `results/realistic_scan.txt` respectively.  
 Do the same thing for `realistic_look_two` and `realistic_scan_two` to use two elevators.  
-By a very quick empiric verification, we have that the elevator is stopped at a given floor for approxmiatively 13s before it starts to move, and that it takes approxmiatively 2s for it to go from one floor to another.

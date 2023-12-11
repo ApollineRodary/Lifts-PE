@@ -60,7 +60,7 @@ def expected_waiting_time(i):
  
 # Graph expected waiting time as a function of average arrival rate
 
-x=np.arange(0, 2.2, 0.2)
+x=np.arange(0.2, 2.2, 0.2)
 
 WHICH_GRAPH = 1
 
@@ -68,7 +68,7 @@ if WHICH_GRAPH == 1:
     # Thibault's
     mu = 6/expected_waiting_time(capacity)
     lam = x
-    y = 1.0/(mu-lam) + 0.6
+    y = 1.0/(mu-lam)
 
 elif WHICH_GRAPH == 2:
     # Isaline's
@@ -80,18 +80,31 @@ plt.plot(x, y, label="$1/(\mu - \lambda)$")
 
 # Graph simulation results as a function of average arrival rate
 
-with open("results/one_src_multiple_target.json", "r") as json_file:
+with open("results/look_one_src_multiple_target.json", "r") as json_file:
     simulation_results = json.load(json_file)["results"]
-
 mean = sum([np.array(d["means"]) for d in simulation_results]) / len(simulation_results)
+plt.plot(simulation_results[0]["lambdas"], mean, label="LOOK 1 elevator")
 
-plt.plot(simulation_results[0]["lambdas"], mean, label="Monod simulation")
+with open("results/look_one_src_multiple_target_two_elevators.json", "r") as json_file:
+    simulation_results = json.load(json_file)["results"]
+mean = sum([np.array(d["means"]) for d in simulation_results]) / len(simulation_results)
+plt.plot(simulation_results[0]["lambdas"], mean, label="LOOK 2 elevators")
+
+with open("results/scan_one_src_multiple_target.json", "r") as json_file:
+    simulation_results = json.load(json_file)["results"]
+mean = sum([np.array(d["means"]) for d in simulation_results]) / len(simulation_results)
+plt.plot(simulation_results[0]["lambdas"], mean, label="SCAN 1 elevator")
+
+with open("results/scan_one_src_multiple_target_two_elevators.json", "r") as json_file:
+    simulation_results = json.load(json_file)["results"]
+mean = sum([np.array(d["means"]) for d in simulation_results]) / len(simulation_results)
+plt.plot(simulation_results[0]["lambdas"], mean, label="SCAN 2 elevators")
+
 plt.legend()
 
 plt.xlabel('$\lambda$ (arrivals/min)')
 plt.ylabel('Expected waiting time (min)')
-plt.show()
 
-""" l=0.2
-print("exp time model_2", 1.0/(mu-l))
-print("exp time model_1", 1.0/((mu/6)-l/6)) """
+plt.savefig("results/graphs_one_source_multiple_targets")
+
+plt.show()
