@@ -9,10 +9,10 @@
 #include "elevator_system.hpp"
 #include "simulation.hpp"
 #include "log.hpp"
-#include "algorithms/look.cpp"
+#include "algorithms/scan.cpp"
 #include "generation/user_generation.hpp"
 
-#define OUTPUT_FILENAME "../results/realistic_scan.txt"
+#define OUTPUT_FILENAME "../results/realistic_scan_two.txt"
 
 int main() {
     int nb_tests = 1000;
@@ -66,9 +66,10 @@ int main() {
 
     for (int _ = 0 ; _ < nb_tests ; _++) {
         //Instanciate ElevatorSystem
-        LookElevatorSystem monod(-1, 4);
+        ScanElevatorSystem monod(-1, 4);
         //Reinstanciate an elevator
-        LookElevator e(monod, 0, max_capacity);
+        ScanElevator e1(monod, 0, max_capacity);
+        ScanElevator e2(monod, 0, max_capacity);
 
         vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
 

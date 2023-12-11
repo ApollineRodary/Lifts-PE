@@ -9,10 +9,10 @@
 #include "elevator_system.hpp"
 #include "simulation.hpp"
 #include "log.hpp"
-#include "algorithms/look.cpp"
+#include "algorithms/scan.cpp"
 #include "generation/user_generation.hpp"
 
-#define OUTPUT_FILENAME "../results/one_src_multiple_target.json"
+#define OUTPUT_FILENAME "../results/scan_one_src_multiple_target_two_elevators.json"
 
 int main() {
     int nb_tests = 50;
@@ -47,21 +47,25 @@ int main() {
     if (!file.is_open())
         cerr << "Unable to open file " OUTPUT_FILENAME "...\n";
     
-    file << "{\n  \"results\": [" << endl;
+    file << "{\"results\":[" << endl;
 
     for (int _ = 0 ; _ < nb_tests ; _++) {
         //Launch the simulations
         vector<float> means;
-        for (float lambda: lambdas) {
-            cout << endl << "\n===== LAMBDA: " << lambda << " arrivals per second =====" << endl; 
+        for (float lambda : lambdas) {
+            cout << endl << "===== LAMBDA: " << lambda << " arrivals per second =====" << endl; 
 
-            LookElevatorSystem monod(0, 4);
-            LookElevator e(monod, 0, max_capacity);
+            //Reinstanciate ElevatorSystem
+            ScanElevatorSystem monod(0, 4);
+
+            //Reinstanciate an elevator
+            ScanElevator e1(monod, 0, max_capacity);
+            ScanElevator e2(monod, 0, max_capacity);
             
-            // Information
+            //Informations
             cout << "There should be approximately " << lambda * time_simu << " arrivals" << endl << endl;
 
-            // Arrivals only at the ground floor, all users go to a random floor (uniform)
+            //Arrivals only at the ground floor, all users go to a random floor (uniform)
             vector<float> lambdas = {lambda, 0, 0, 0, 0};
             vector<vector<int>> target_distrib = {
                 {0, 1, 1, 1, 1},
@@ -73,62 +77,64 @@ int main() {
 
             vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
 
-            // Print user info
-            for (auto user: users)
-                cout << "(" << user->getGoals().front().time << "): " << user->getGoals().front().source_floor << "->" << user->getGoals().front().target_floor << ", ";
-            cout << endl << "There are " << users.size() << " arrivals" << endl;
+            //Print users infos
+            for (auto user : users) {
+                cout << "===== USER ===== " << endl
+                    << "Arrival time: " << user->getGoals().front().time << endl
+                    << "Target floor: " << user->getGoals().front().target_floor << endl
+                    << "Source floor: " << user->getGoals().front().source_floor << " (should be 0)" << endl
+                    << "Weight: " << user->getWeight() << " (should be 1)" << endl << endl;
+            }
+            cout << "There are " << users.size() << " arrivals" << endl;
 
-            // Launch simulation
+            //Launch simulation
             Simulation sim(monod, users);
             sim.repeat(time_simu);
 
-            // Compute mean waiting time
+            //Compute mean waiting time
             float mean = 0;
             int served_users = 0;
-            cout << "Waiting times: ";
-            for (auto user: users) {
-                cout << user->getTotalWaitingTime() << ", ";
-                if (user->getIsServed()) {
+            for (auto user : users) {
+                cout << "User served:" << user->getIsServed() << " ; Waiting: " <<  user->getTotalWaitingTime() << endl;
+                if (user->getIsServed())
                     mean += user->getTotalWaitingTime();
                     served_users++;
-                }
             }
-
             mean /= served_users;
             mean *= tick_duration;
             mean /= 60;
             means.push_back(mean);
 
-            // Clean memory
+            //Clean memory
             delete_generated_users(users);
         }
 
-        // Print information
+        //Print informations
         cout << endl << endl;
         for (int i = 0 ; i < lambdas.size() ; i++) {
             cout << "Lambda: " << lambdas[i]*60/tick_duration << endl << "Mean waiting time: " << means[i] << endl;
         }
 
-        // Write JSON file
-        file << "    {\n      \"lambdas\": [";
+        //Write json file
+        file << "{\"lambdas\": [";
         for (int i = 0 ; i < lambdas.size() ; i++) {
             file << lambdas[i]*60/tick_duration;
             if (i < lambdas.size() - 1) {
-                file << ", ";
+                file << ",";
             }
         }
-        file << "],\n      \"means\": [";
+        file << "],\"means\":[";
         for (int i = 0 ; i < means.size() ; i++) {
             file << means[i];
             if (i < means.size() - 1) {
-                file << ", ";
+                file << ",";
             }
         }
-        file << "]\n    }";
+        file << "]}";
         if (_ < nb_tests - 1)
-            file << ", " << endl;
+            file << "," << endl;
     }
-    file << endl << "  ]\n}";
+    file << endl << "]}";
     file.close();
     
     

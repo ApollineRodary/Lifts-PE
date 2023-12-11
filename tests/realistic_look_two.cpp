@@ -68,7 +68,8 @@ int main() {
         //Instanciate ElevatorSystem
         LookElevatorSystem monod(-1, 4);
         //Reinstanciate an elevator
-        LookElevator e(monod, 0, max_capacity);
+        LookElevator e1(monod, 0, max_capacity);
+        LookElevator e2(monod, 0, max_capacity);
 
         vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
 

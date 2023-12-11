@@ -19,8 +19,8 @@ int main() {
 
     float tick_duration = 1; //second
     float time_simu = 6000; //seconds
-    float open_time = 0.8*60; //seconds
-    float move_time = 0.1*60; //seconds
+    float open_time = 13; //seconds
+    float move_time = 4; //seconds
     int max_capacity = 13;
 
     //Convert into ticks
@@ -38,8 +38,9 @@ int main() {
         << "Max capacity: " << max_capacity << endl;
     cout << endl;
     
-    float mean_sum = 0;
-    float mean_sum_squared = 0;
+    float mean = 0;
+    float mean_squared = 0;
+    int nb_users = 0;
     
     //Arrivals only at the ground floor, all users go to a random floor (uniform)
     vector<float> lambdas_minutes = {1./5., 1./2., 1./10., 0., 1./7., 1./7.}; //Arrivals per minute
@@ -69,9 +70,6 @@ int main() {
         //Reinstanciate an elevator
         ScanElevator e(monod, 0, max_capacity);
 
-        float waiting_sum = 0;
-        float waiting_sum_squared = 0;
-
         vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
 
         //Print users infos
@@ -89,43 +87,35 @@ int main() {
         sim.repeat(time_simu);
 
         //Compute mean waiting time
-        int user_served = 0;
         for (auto user : users) {
             cout << "User served: " << user->getIsServed() << " ; Waiting time: " <<  user->getTotalWaitingTime() << endl;
             if (user->getIsServed()) {
-                waiting_sum += user->getTotalWaitingTime()*tick_duration/60;
-                waiting_sum_squared += user->getTotalWaitingTimeSquared()*(tick_duration/60)*(tick_duration/60);
-                user_served++;
+                mean += user->getTotalWaitingTime()*tick_duration/60;
+                mean_squared += user->getTotalWaitingTimeSquared()*(tick_duration/60)*(tick_duration/60);
+                nb_users++;
             }
                 
         }
-
-        waiting_sum /= user_served;
-        waiting_sum_squared /= user_served;
-
-        mean_sum += waiting_sum;
-        mean_sum_squared += waiting_sum_squared;
-
         //Clean memory
         delete_generated_users(users);
     }
 
-    mean_sum /= nb_tests;
-    mean_sum_squared /= nb_tests;
+    mean /= nb_users;
+    mean_squared /= nb_tests;
     
 
     //Print informations
     cout << endl << endl;
-    cout << "Average of the mean of waiting times on all expermients: " << mean_sum << endl
-        << "Average of the mean of squared waiting times on all experiments: " << mean_sum_squared << endl;
+    cout << "Mean of waiting times on all expermients: " << mean << endl
+        << "Mean of squared waiting times on all experiments: " << mean_squared << endl;
 
     ofstream file(OUTPUT_FILENAME, ios_base::out);
 
     if (!file.is_open())
         cerr << "Unable to open file " OUTPUT_FILENAME "...\n";
     
-    file << "Average mean waiting time over " << nb_tests << " experiments: " << mean_sum << " min" << endl
-        << "Average mean squared waiting time over " << nb_tests << " experiments: " << mean_sum_squared << " min^2" << endl;
+    file << "Mean of waiting time over " << nb_tests << " experiments: " << mean << " min" << endl
+        << "Mean of squared waiting time over " << nb_tests << " experiments: " << mean_squared << " min^2" << endl;
 
 
     return 0;
