@@ -57,7 +57,7 @@ def G(m,l,i):
 # Expectation function
 #This function allows us to calculate the expectation 
 #of travel time of the elevator for i passangers
-def exp_mu(i):
+def exp(i):
     sum=0
     sum_m=0
     for l in range(1,N+1):
@@ -68,14 +68,14 @@ def exp_mu(i):
             g=G(m,l,i)
             sum=sum + p*g
             sum_m=sum_m + m*g
-    return sum_m/sum 
+    return sum/4
 
 
 
 #Graph Function
 #This function create the graph of the expectation as a function of i 
-mu = exp_mu(c)
-x=np.arange(0.2, 2.2, 0.2)
+mu = 1/exp(c)
+x=np.arange(0.2, 1.6, 0.2)
 lam=x
 y=1.0/(mu-lam)
 plt.plot(x, y, label="Model")
