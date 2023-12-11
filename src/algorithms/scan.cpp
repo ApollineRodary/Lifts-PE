@@ -61,7 +61,7 @@ public:
                 case UP:
                     // If the elevator is going up, then go to the next requested floor above, and reset once there is no request left
                     if (e->getIsOpen() && e->getUsers().size() == 0) {
-                        e->sweepDirection = UP;
+                        e->sweepDirection = DOWN;
                         break;
                     }
                     requests_left = false;
@@ -98,12 +98,9 @@ public:
     }
 
     void call(int floor, int time, string command) override {
+        debugStream("ScanElevatorSystem::call") << '!' << time << '?' << command << '!' << floor << endl;
         for (auto elevator: getElevators()) {
             ScanElevator* e = (ScanElevator*) elevator;
-
-            // Ignore calls that are not farther along in the sweep direction
-            if ((e->getFloor() > floor && e->sweepDirection == DOWN) || (e->getFloor() < floor && e->sweepDirection == UP))
-                break;
             
             if (elevator->getFloor() != floor || !elevator->getTargetFloor().has_value())
                 elevator->requestFloor(floor, time);
