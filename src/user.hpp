@@ -30,6 +30,7 @@ private:
     optional<Goal> current_goal;
     int total_waiting_time = 0;
     int total_regret_time = 0;
+    int total_waiting_time_squared = 0;
     int last_request_time;
     bool is_served = false;
 
@@ -47,6 +48,7 @@ public:
     int getTotalWaitingTime();
     int getTotalRegretTime();
     bool getIsServed();
+    int getTotalWaitingTimeSquared();
 };
 
 #endif

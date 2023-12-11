@@ -12,9 +12,11 @@
 #include "algorithms/scan.cpp"
 #include "generation/user_generation.hpp"
 
-#define OUTPUT_FILENAME "../results/one_src_multiple_target.json"
+#define OUTPUT_FILENAME "../results/realistic_scan.txt"
 
 int main() {
+    int nb_tests = 1000;
+
     float tick_duration = 1; //second
     float time_simu = 6000; //seconds
     float open_time = 0.8*60; //seconds
@@ -26,8 +28,7 @@ int main() {
     ELEVATOR_OPEN_DELAY = round(open_time/tick_duration);
     ELEVATOR_MOVE_DELAY = round(move_time/tick_duration);
 
-    //Instanciate ElevatorSystem
-    ScanElevatorSystem monod(-1, 4);
+    
 
     //Print infos
     cout << "SCAN ALGORITHM" << endl << "Total simulation time: " << time_simu << " ticks" << endl
@@ -36,12 +37,9 @@ int main() {
         << "Tick duration: " << tick_duration << " s" << endl
         << "Max capacity: " << max_capacity << endl;
     cout << endl;
-
-    //Instanciate lambdas used for the simulation
-    float mean = 0;
-
-    //Reinstanciate an elevator
-    ScanElevator e(monod, 0, max_capacity);
+    
+    float mean_sum = 0;
+    float mean_sum_squared = 0;
     
     //Arrivals only at the ground floor, all users go to a random floor (uniform)
     vector<float> lambdas_minutes = {1./5., 1./2., 1./10., 0., 1./7., 1./7.}; //Arrivals per minute
@@ -65,41 +63,70 @@ int main() {
         {1, 10, 1, 0, 0, 0}
     };
 
-    vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
+    for (int _ = 0 ; _ < nb_tests ; _++) {
+        //Instanciate ElevatorSystem
+        ScanElevatorSystem monod(-1, 4);
+        //Reinstanciate an elevator
+        ScanElevator e(monod, 0, max_capacity);
 
-    //Print users infos
-    for (auto user : users) {
-        cout << "===== USER ===== " << endl
-            << "Arrival time: " << user->getGoals().front().time << endl
-            << "Target floor: " << user->getGoals().front().target_floor << endl
-            << "Source floor: " << user->getGoals().front().source_floor << " (should be 0)" << endl
-            << "Weight: " << user->getWeight() << " (should be 1)" << endl << endl;
-    }
-    cout << "There are " << users.size() << " arrivals" << endl;
+        float waiting_sum = 0;
+        float waiting_sum_squared = 0;
 
-    //Launch simulation
-    Simulation sim(monod, users);
-    sim.repeat(time_simu);
+        vector<User*> users = user_generation(lambdas, 1, 0, target_distrib, time_simu, monod);
 
-    //Compute mean waiting time
-    int user_served = 0;
-    for (auto user : users) {
-        cout << "User served: " << user->getIsServed() << " ; Waiting time: " <<  user->getTotalWaitingTime() << endl;
-        if (user->getIsServed()) {
-            mean += user->getTotalWaitingTime();
-            user_served++;
+        //Print users infos
+        for (auto user : users) {
+            cout << "===== USER ===== " << endl
+                << "Arrival time: " << user->getGoals().front().time << endl
+                << "Target floor: " << user->getGoals().front().target_floor << endl
+                << "Source floor: " << user->getGoals().front().source_floor << " (should be 0)" << endl
+                << "Weight: " << user->getWeight() << " (should be 1)" << endl << endl;
         }
-            
-    }
-    mean /= user_served;
-    mean *= tick_duration/60;
+        cout << "There are " << users.size() << " arrivals" << endl;
 
-    //Clean memory
-    delete_generated_users(users);
+        //Launch simulation
+        Simulation sim(monod, users);
+        sim.repeat(time_simu);
+
+        //Compute mean waiting time
+        int user_served = 0;
+        for (auto user : users) {
+            cout << "User served: " << user->getIsServed() << " ; Waiting time: " <<  user->getTotalWaitingTime() << endl;
+            if (user->getIsServed()) {
+                waiting_sum += user->getTotalWaitingTime()*tick_duration/60;
+                waiting_sum_squared += user->getTotalWaitingTimeSquared()*(tick_duration/60)*(tick_duration/60);
+                user_served++;
+            }
+                
+        }
+
+        waiting_sum /= user_served;
+        waiting_sum_squared /= user_served;
+
+        mean_sum += waiting_sum;
+        mean_sum_squared += waiting_sum_squared;
+
+        //Clean memory
+        delete_generated_users(users);
+    }
+
+    mean_sum /= nb_tests;
+    mean_sum_squared /= nb_tests;
+    
 
     //Print informations
     cout << endl << endl;
-    cout << "Mean waiting time: " << mean  << " minutes" << endl;
+    cout << "Average of the mean of waiting times on all expermients: " << mean_sum << endl
+        << "Average of the mean of squared waiting times on all experiments: " << mean_sum_squared << endl;
+
+    ofstream file(OUTPUT_FILENAME, ios_base::out);
+
+    if (!file.is_open())
+        cerr << "Unable to open file " OUTPUT_FILENAME "...\n";
+    
+    file << "Average mean waiting time over " << nb_tests << " experiments: " << mean_sum << " min" << endl
+        << "Average mean squared waiting time over " << nb_tests << " experiments: " << mean_sum_squared << " min^2" << endl;
+
 
     return 0;
 }
