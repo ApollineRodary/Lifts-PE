@@ -35,6 +35,7 @@ public:
     int getFloor();
     int getCapacity();
     int getRemainingCapacity();
+    int getTimeSinceLastUpdate();
     bool getIsOpen();
     optional<int> getTargetFloor();
     Direction getDirection();

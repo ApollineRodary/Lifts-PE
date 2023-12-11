@@ -24,6 +24,10 @@ int Elevator::getCapacity() {
     return capacity;
 }
 
+int Elevator::getTimeSinceLastUpdate() {
+    return time_since_last_update;
+}
+
 int Elevator::getRemainingCapacity() {
     int total_weight = 0;
     for (User* u: getUsers())
